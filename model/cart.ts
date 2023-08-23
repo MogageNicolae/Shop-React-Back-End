@@ -1,7 +1,7 @@
 import {Schema, model} from "mongoose";
 
 export interface CartProductInterface {
-    productId: number;
+    id: number;
     title: string;
     description: string;
     price: number;
@@ -20,7 +20,7 @@ export interface CartInterface {
 
 const cartProductSchema = new Schema<CartProductInterface>(
     {
-        productId: Number,
+        id: Number,
         title: String,
         description: String,
         price: Number,

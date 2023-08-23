@@ -1,7 +1,7 @@
 import {Schema, model} from "mongoose";
 
 export interface ProductInterface {
-    productId: number,
+    id: number,
     title: string,
     description: string,
     price: number,
@@ -16,7 +16,7 @@ export interface ProductInterface {
 
 export const productSchema = new Schema<ProductInterface>(
     {
-        productId: {
+        id: {
             type: Number,
             required: true,
         },

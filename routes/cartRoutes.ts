@@ -19,6 +19,10 @@ router.post('/get', jsonParser, (req, res) => {
 
 router.post('/get/size', jsonParser, (req, res) => {
     const clientId: string = req.body.id;
+    if (clientId === null) {
+        res.json(0);
+        return;
+    }
     const next = () => CartModel.findOne({clientId: clientId}).exec().then(
         (data) => {
             if (data === null) {
@@ -49,7 +53,7 @@ router.post('', jsonParser, async (req, res) => {
                         cartData.products = getUpdatedCartProducts(cartData.products, product);
                         cartData.quantity += 1;
                         cartData.total += product.price;
-                        cartData.discountTotal += product.price * (1 - product.discountPercentage / 100);
+                        cartData.discountTotal += Math.floor(product.price * (1 - product.discountPercentage / 100));
                         updateCart(clientId, cartData).then(
                             (data) => {
                                 res.json(data);
@@ -69,10 +73,10 @@ router.put('', jsonParser, async (req, res) => {
         (data) => {
             if (data) {
                 data.products = data.products.map((product: CartProductInterface) => {
-                    if (product.productId == productId) {
+                    if (product.id == productId) {
                         data.quantity += quantity - product.quantity;
-                        data.total += data.quantity * product.price;
-                        data.discountTotal += data.total * (1 - product.discountPercentage / 100);
+                        data.total += (quantity - product.quantity) * product.price;
+                        data.discountTotal += Math.floor(product.price * (1 - product.discountPercentage / 100)) * (quantity - product.quantity);
                         product.quantity = quantity;
                     }
                     return product;
@@ -93,15 +97,15 @@ router.delete('', jsonParser, async (req, res) => {
     const next = () => CartModel.findOne({clientId: clientId}).exec().then(
         (data) => {
             if (data) {
-                let removedProduct: CartProductInterface | undefined = data.products.find((product: CartProductInterface) => product.productId == productId);
+                let removedProduct: CartProductInterface | undefined = data.products.find((product: CartProductInterface) => product.id == productId);
                 if (removedProduct === undefined) {
                     res.json('Product not found');
                     return;
                 }
-                data.products = data.products.filter((product: CartProductInterface) => product.productId != productId);
+                data.products = data.products.filter((product: CartProductInterface) => product.id != productId);
                 data.quantity -= removedProduct.quantity;
                 data.total -= removedProduct.quantity * removedProduct.price;
-                data.discountTotal -= removedProduct.quantity * removedProduct.price * (1 - removedProduct.discountPercentage / 100);
+                data.discountTotal -= Math.floor(removedProduct.price * (1 - removedProduct.discountPercentage / 100)) * removedProduct.quantity;
                 updateCart(clientId, data).then(
                     (data) => {
                         res.json(data);
@@ -141,12 +145,12 @@ const updateCart = async (clientId: string, updatedCart: CartInterface) => {
 }
 
 const getCartProducts = async (productId: number) => {
-    const productData = await ProductModel.findOne({productId: productId}).exec();
+    const productData = await ProductModel.findOne({id: productId}).exec();
     if (productData === null) {
         return null;
     }
     const product: CartProductInterface = {
-        productId: productData.productId,
+        id: productData.id,
         title: productData.title,
         description: productData.description,
         price: productData.price,
@@ -159,8 +163,8 @@ const getCartProducts = async (productId: number) => {
 
 const getUpdatedCartProducts = (products: CartProductInterface[], productToAdd: CartProductInterface) => {
     let updatedProducts: CartProductInterface[] = products;
-    if (products.find((product: CartProductInterface): boolean => product.productId == productToAdd.productId)) {
-        const index: number = products.findIndex((product: CartProductInterface): boolean => product.productId == productToAdd.productId);
+    if (products.find((product: CartProductInterface): boolean => product.id == productToAdd.id)) {
+        const index: number = products.findIndex((product: CartProductInterface): boolean => product.id == productToAdd.id);
         updatedProducts[index].quantity += 1;
     } else {
         productToAdd.quantity = 1;

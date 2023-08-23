@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 const cartProductSchema = new Schema({
-    productId: Number,
+    id: Number,
     title: String,
     description: String,
     price: Number,
