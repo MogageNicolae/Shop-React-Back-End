@@ -77,9 +77,7 @@ router.put('', jsonParser, async (req, res) => {
     checkToken(req, res, clientId, next);
 });
 router.delete('', jsonParser, async (req, res) => {
-    const clientId = req.body.id;
-    const productId = req.body.productId;
-    const next = () => CartModel.findOne({ clientId: clientId }).exec().then((data) => {
+    const clientId = req.body.id, productId = req.body.productId, next = () => CartModel.findOne({ clientId: clientId }).exec().then((data) => {
         if (data) {
             let removedProduct = data.products.find((product) => product.id == productId);
             if (removedProduct === undefined) {
@@ -118,7 +116,7 @@ const createNewCart = async (clientId, product) => {
     return await cart.save();
 };
 const updateCart = async (clientId, updatedCart) => {
-    return await CartModel.updateOne({ clientId: clientId }, updatedCart).exec();
+    return await CartModel.findOneAndUpdate({ clientId: clientId }, updatedCart, { new: true }).exec();
 };
 const getCartProducts = async (productId) => {
     const productData = await ProductModel.findOne({ id: productId }).exec();

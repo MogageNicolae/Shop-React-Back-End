@@ -92,27 +92,27 @@ router.put('', jsonParser, async (req, res) => {
 });
 
 router.delete('', jsonParser, async (req, res) => {
-    const clientId: string = req.body.id;
-    const productId: number = req.body.productId;
-    const next = () => CartModel.findOne({clientId: clientId}).exec().then(
-        (data) => {
-            if (data) {
-                let removedProduct: CartProductInterface | undefined = data.products.find((product: CartProductInterface) => product.id == productId);
-                if (removedProduct === undefined) {
-                    res.json('Product not found');
-                    return;
-                }
-                data.products = data.products.filter((product: CartProductInterface) => product.id != productId);
-                data.quantity -= removedProduct.quantity;
-                data.total -= removedProduct.quantity * removedProduct.price;
-                data.discountTotal -= Math.floor(removedProduct.price * (1 - removedProduct.discountPercentage / 100)) * removedProduct.quantity;
-                updateCart(clientId, data).then(
-                    (data) => {
-                        res.json(data);
+    const clientId: string = req.body.id,
+        productId: number = req.body.productId,
+        next = () => CartModel.findOne({clientId: clientId}).exec().then(
+            (data) => {
+                if (data) {
+                    let removedProduct: CartProductInterface | undefined = data.products.find((product: CartProductInterface) => product.id == productId);
+                    if (removedProduct === undefined) {
+                        res.json('Product not found');
+                        return;
                     }
-                );
-            }
-        });
+                    data.products = data.products.filter((product: CartProductInterface) => product.id != productId);
+                    data.quantity -= removedProduct.quantity;
+                    data.total -= removedProduct.quantity * removedProduct.price;
+                    data.discountTotal -= Math.floor(removedProduct.price * (1 - removedProduct.discountPercentage / 100)) * removedProduct.quantity;
+                    updateCart(clientId, data).then(
+                        (data) => {
+                            res.json(data);
+                        }
+                    );
+                }
+            });
     checkToken(req, res, clientId, next);
 });
 
@@ -141,7 +141,7 @@ const createNewCart = async (clientId: string, product: CartProductInterface) =>
 }
 
 const updateCart = async (clientId: string, updatedCart: CartInterface) => {
-    return await CartModel.updateOne({clientId: clientId}, updatedCart).exec();
+    return await CartModel.findOneAndUpdate({clientId: clientId}, updatedCart, {new:true}).exec();
 }
 
 const getCartProducts = async (productId: number) => {
