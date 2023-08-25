@@ -6,16 +6,22 @@ const router = express.Router();
 const jsonParser = bodyParser.json()
 
 router.get('/size', (req, res) => {
-    if (req.query.categories == undefined) {
-        ProductModel.countDocuments().exec().then(
-            (data) => {
-                res.json(data);
-            });
-        return;
+    interface FilterType {
+        title: RegExp;
+        category?: { $in: string[] };
     }
-    const categoriesParam: string = req.query.categories as string,
-        categories: string[] = categoriesParam.split(',');
-    ProductModel.countDocuments({'category': {$in: categories}}).exec().then(
+
+    const categoriesParam: string = (req.query.categories === undefined) ? '' : req.query.categories as string,
+        categories: string[] = categoriesParam.split(','),
+        search: string = (req.query.search == undefined) ? '.' : req.query.search as string,
+        searchRegex = new RegExp(search, 'i'),
+        filter: FilterType = {
+            'title': searchRegex,
+        };
+    if (categoriesParam !== '') {
+        filter['category'] = {$in: categories};
+    }
+    ProductModel.countDocuments(filter).exec().then(
         (data) => {
             res.json(data);
         });
@@ -23,8 +29,10 @@ router.get('/size', (req, res) => {
 
 router.get('', (req, res) => {
     const page: number = (req.query.page == undefined) ? 1 : +req.query.page,
-        noOfProducts: number = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts;
-    ProductModel.find({}, {'_id': 0}).skip(noOfProducts * (page - 1)).limit(noOfProducts).exec().then(
+        noOfProducts: number = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts,
+        search: string = (req.query.search == undefined) ? '.' : req.query.search as string,
+        searchRegex = new RegExp(search, 'i');
+    ProductModel.find({'title': searchRegex}, {'_id': 0}).skip(noOfProducts * (page - 1)).limit(noOfProducts).exec().then(
         (data) => {
             res.json(data);
         });
@@ -39,9 +47,11 @@ router.get('/categories', (req, res) => {
     } else {
         const page: number = (req.query.page == undefined) ? 1 : +req.query.page,
             noOfProducts: number = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts,
+            search: string = (req.query.search == undefined) ? '.' : req.query.search as string,
+            searchRegex = new RegExp(search, 'i'),
             categoriesParam: string = req.query.categories as string,
             categories: string[] = categoriesParam.split(',');
-        ProductModel.find({'category': {$in: categories}}, {'_id': 0})
+        ProductModel.find({'category': {$in: categories}, 'title': searchRegex}, {'_id': 0})
             .skip(noOfProducts * (page - 1))
             .limit(noOfProducts).exec().then(
             (data) => {

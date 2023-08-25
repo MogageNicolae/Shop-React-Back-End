@@ -1,8 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import CartModel, {CartInterface, CartProductInterface} from "../model/cart.js";
-import ProductModel from "../model/product.js";
-import ClientModel from "../model/client.js";
+import CartModel, {CartProductInterface} from "../model/cart.js";
+import {checkToken} from "../utils/defaultUtils.js";
+import {createNewCart, getCartProduct, getUpdatedCartProducts, updateCart} from "../utils/cartUtils.js";
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
@@ -36,7 +36,7 @@ router.post('/get/size', jsonParser, (req, res) => {
 
 router.post('', jsonParser, async (req, res) => {
     const clientId: string = req.body.id;
-    const next = () => getCartProducts(req.body.productId).then(
+    const next = () => getCartProduct(req.body.productId).then(
         (product) => {
             if (product === null) {
                 res.json('Product not found');
@@ -116,61 +116,5 @@ router.delete('', jsonParser, async (req, res) => {
     checkToken(req, res, clientId, next);
 });
 
-const checkToken = (req: express.Request, res: express.Response, clientId: string, next: express.NextFunction) => {
-    const token: string = req.header('Auth') || '';
-    ClientModel.findById({_id: clientId}).exec().then(
-        (data) => {
-            if (data === null || token == '' || data.token != token) {
-                res.json('Invalid session.');
-                return;
-            }
-            next();
-        });
-}
-
-const createNewCart = async (clientId: string, product: CartProductInterface) => {
-    const cart = new CartModel(
-        {
-            clientId: clientId,
-            discountTotal: product.price * (1 - product.discountPercentage / 100),
-            total: product.price,
-            quantity: 1,
-            products: [product],
-        });
-    return await cart.save();
-}
-
-const updateCart = async (clientId: string, updatedCart: CartInterface) => {
-    return await CartModel.findOneAndUpdate({clientId: clientId}, updatedCart, {new:true}).exec();
-}
-
-const getCartProducts = async (productId: number) => {
-    const productData = await ProductModel.findOne({id: productId}).exec();
-    if (productData === null) {
-        return null;
-    }
-    const product: CartProductInterface = {
-        id: productData.id,
-        title: productData.title,
-        description: productData.description,
-        price: productData.price,
-        discountPercentage: productData.discountPercentage,
-        thumbnail: productData.thumbnail,
-        quantity: 1,
-    }
-    return product;
-}
-
-const getUpdatedCartProducts = (products: CartProductInterface[], productToAdd: CartProductInterface) => {
-    let updatedProducts: CartProductInterface[] = products;
-    if (products.find((product: CartProductInterface): boolean => product.id == productToAdd.id)) {
-        const index: number = products.findIndex((product: CartProductInterface): boolean => product.id == productToAdd.id);
-        updatedProducts[index].quantity += 1;
-    } else {
-        productToAdd.quantity = 1;
-        updatedProducts = [...products, productToAdd];
-    }
-    return updatedProducts;
-}
 
 export default router;

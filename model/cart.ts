@@ -29,7 +29,7 @@ const cartProductSchema = new Schema<CartProductInterface>(
         quantity: Number,
     });
 
-const cartSchema = new Schema<CartInterface>(
+export const cartSchema = new Schema<CartInterface>(
     {
         clientId: {
             type: String,

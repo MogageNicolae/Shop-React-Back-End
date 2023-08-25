@@ -4,20 +4,19 @@ import ProductModel from "../model/product.js";
 const router = express.Router();
 const jsonParser = bodyParser.json();
 router.get('/size', (req, res) => {
-    if (req.query.categories == undefined) {
-        ProductModel.countDocuments().exec().then((data) => {
-            res.json(data);
-        });
-        return;
+    const categoriesParam = (req.query.categories === undefined) ? '' : req.query.categories, categories = categoriesParam.split(','), search = (req.query.search == undefined) ? '.' : req.query.search, searchRegex = new RegExp(search, 'i'), filter = {
+        'title': searchRegex,
+    };
+    if (categoriesParam !== '') {
+        filter['category'] = { $in: categories };
     }
-    const categoriesParam = req.query.categories, categories = categoriesParam.split(',');
-    ProductModel.countDocuments({ 'category': { $in: categories } }).exec().then((data) => {
+    ProductModel.countDocuments(filter).exec().then((data) => {
         res.json(data);
     });
 });
 router.get('', (req, res) => {
-    const page = (req.query.page == undefined) ? 1 : +req.query.page, noOfProducts = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts;
-    ProductModel.find({}, { '_id': 0 }).skip(noOfProducts * (page - 1)).limit(noOfProducts).exec().then((data) => {
+    const page = (req.query.page == undefined) ? 1 : +req.query.page, noOfProducts = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts, search = (req.query.search == undefined) ? '.' : req.query.search, searchRegex = new RegExp(search, 'i');
+    ProductModel.find({ 'title': searchRegex }, { '_id': 0 }).skip(noOfProducts * (page - 1)).limit(noOfProducts).exec().then((data) => {
         res.json(data);
     });
 });
@@ -28,8 +27,8 @@ router.get('/categories', (req, res) => {
         });
     }
     else {
-        const page = (req.query.page == undefined) ? 1 : +req.query.page, noOfProducts = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts, categoriesParam = req.query.categories, categories = categoriesParam.split(',');
-        ProductModel.find({ 'category': { $in: categories } }, { '_id': 0 })
+        const page = (req.query.page == undefined) ? 1 : +req.query.page, noOfProducts = (req.query.noOfProducts == undefined) ? 12 : +req.query.noOfProducts, search = (req.query.search == undefined) ? '.' : req.query.search, searchRegex = new RegExp(search, 'i'), categoriesParam = req.query.categories, categories = categoriesParam.split(',');
+        ProductModel.find({ 'category': { $in: categories }, 'title': searchRegex }, { '_id': 0 })
             .skip(noOfProducts * (page - 1))
             .limit(noOfProducts).exec().then((data) => {
             res.json(data);

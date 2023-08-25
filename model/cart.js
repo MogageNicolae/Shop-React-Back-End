@@ -8,7 +8,7 @@ const cartProductSchema = new Schema({
     thumbnail: String,
     quantity: Number,
 });
-const cartSchema = new Schema({
+export const cartSchema = new Schema({
     clientId: {
         type: String,
         required: true,

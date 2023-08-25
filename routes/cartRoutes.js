@@ -1,8 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import CartModel from "../model/cart.js";
-import ProductModel from "../model/product.js";
-import ClientModel from "../model/client.js";
+import { checkToken } from "../utils/defaultUtils.js";
+import { createNewCart, getCartProduct, getUpdatedCartProducts, updateCart } from "../utils/cartUtils.js";
 const router = express.Router();
 const jsonParser = bodyParser.json();
 router.post('/get', jsonParser, (req, res) => {
@@ -30,7 +30,7 @@ router.post('/get/size', jsonParser, (req, res) => {
 });
 router.post('', jsonParser, async (req, res) => {
     const clientId = req.body.id;
-    const next = () => getCartProducts(req.body.productId).then((product) => {
+    const next = () => getCartProduct(req.body.productId).then((product) => {
         if (product === null) {
             res.json('Product not found');
             return;
@@ -95,55 +95,4 @@ router.delete('', jsonParser, async (req, res) => {
     });
     checkToken(req, res, clientId, next);
 });
-const checkToken = (req, res, clientId, next) => {
-    const token = req.header('Auth') || '';
-    ClientModel.findById({ _id: clientId }).exec().then((data) => {
-        if (data === null || token == '' || data.token != token) {
-            res.json('Invalid session.');
-            return;
-        }
-        next();
-    });
-};
-const createNewCart = async (clientId, product) => {
-    const cart = new CartModel({
-        clientId: clientId,
-        discountTotal: product.price * (1 - product.discountPercentage / 100),
-        total: product.price,
-        quantity: 1,
-        products: [product],
-    });
-    return await cart.save();
-};
-const updateCart = async (clientId, updatedCart) => {
-    return await CartModel.findOneAndUpdate({ clientId: clientId }, updatedCart, { new: true }).exec();
-};
-const getCartProducts = async (productId) => {
-    const productData = await ProductModel.findOne({ id: productId }).exec();
-    if (productData === null) {
-        return null;
-    }
-    const product = {
-        id: productData.id,
-        title: productData.title,
-        description: productData.description,
-        price: productData.price,
-        discountPercentage: productData.discountPercentage,
-        thumbnail: productData.thumbnail,
-        quantity: 1,
-    };
-    return product;
-};
-const getUpdatedCartProducts = (products, productToAdd) => {
-    let updatedProducts = products;
-    if (products.find((product) => product.id == productToAdd.id)) {
-        const index = products.findIndex((product) => product.id == productToAdd.id);
-        updatedProducts[index].quantity += 1;
-    }
-    else {
-        productToAdd.quantity = 1;
-        updatedProducts = [...products, productToAdd];
-    }
-    return updatedProducts;
-};
 export default router;
