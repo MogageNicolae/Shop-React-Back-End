@@ -17,3 +17,4 @@ export const productSchema = new Schema({
 });
 const ProductModel = model('product', productSchema);
 export default ProductModel;
+//# sourceMappingURL=product.js.map

@@ -27,3 +27,4 @@ const orderSchema = new Schema({
     },
 }), OrderModel = model('order', orderSchema);
 export default OrderModel;
+//# sourceMappingURL=order.js.map

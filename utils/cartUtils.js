@@ -1,5 +1,11 @@
 import CartModel from "../model/cart.js";
 import ProductModel from "../model/product.js";
+/**
+ * Creates a new cart.
+ * @param clientId : string - the id of the client
+ * @param product : CartProductInterface - the product to add to the cart
+ * @returns CartInterface - the new cart
+ */
 export const createNewCart = async (clientId, product) => {
     const cart = new CartModel({
         clientId: clientId,
@@ -9,9 +15,22 @@ export const createNewCart = async (clientId, product) => {
         products: [product],
     });
     return await cart.save();
-}, updateCart = async (clientId, updatedCart) => {
+}, 
+/**
+ * Updates the cart of a client.
+ * @param clientId : string - the id of the client
+ * @param updatedCart : CartInterface - the updated cart
+ * @returns CartInterface - the updated cart
+ */
+updateCart = async (clientId, updatedCart) => {
     return await CartModel.findOneAndUpdate({ clientId: clientId }, updatedCart, { new: true }).exec();
-}, getCartProduct = async (productId) => {
+}, 
+/**
+ * Creates a new cart product from a product in the interface.
+ * @param productId : number - the id of the product
+ * @returns CartProductInterface - the cart product
+ */
+createCartProduct = async (productId) => {
     const productData = await ProductModel.findOne({ id: productId }).exec();
     if (productData === null) {
         return null;
@@ -26,7 +45,14 @@ export const createNewCart = async (clientId, product) => {
         quantity: 1,
     };
     return product;
-}, getUpdatedCartProducts = (products, productToAdd) => {
+}, 
+/**
+ * Gets the updated cart products.
+ * @param products : CartProductInterface[] - the products of the cart
+ * @param productToAdd : CartProductInterface - the product to add to the cart
+ * @returns CartProductInterface[] - the updated cart products
+ */
+getUpdatedCartProducts = (products, productToAdd) => {
     let updatedProducts = products;
     if (products.find((product) => product.id == productToAdd.id)) {
         const index = products.findIndex((product) => product.id == productToAdd.id);
@@ -38,3 +64,4 @@ export const createNewCart = async (clientId, product) => {
     }
     return updatedProducts;
 };
+//# sourceMappingURL=cartUtils.js.map

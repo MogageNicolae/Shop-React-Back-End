@@ -19,3 +19,4 @@ const clientSchema = new Schema({
 });
 const ClientModel = model('client', clientSchema);
 export default ClientModel;
+//# sourceMappingURL=client.js.map

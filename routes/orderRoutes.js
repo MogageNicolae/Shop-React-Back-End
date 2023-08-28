@@ -31,3 +31,4 @@ router.post('/:id', jsonParser, (req, res) => {
     checkToken(req, res, clientId, next);
 });
 export default router;
+//# sourceMappingURL=orderRoutes.js.map

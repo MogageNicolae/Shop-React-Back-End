@@ -47,3 +47,4 @@ router.post('/logout', jsonParser, async (req, res) => {
     });
 });
 export default router;
+//# sourceMappingURL=clientRoutes.js.map
