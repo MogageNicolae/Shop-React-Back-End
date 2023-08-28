@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import CartModel from "../model/cart.js";
 import { checkToken } from "../utils/defaultUtils.js";
-import { createNewCart, getCartProduct, getUpdatedCartProducts, updateCart } from "../utils/cartUtils.js";
+import { createNewCart, createCartProduct, getUpdatedCartProducts, updateCart } from "../utils/cartUtils.js";
 const router = express.Router();
 const jsonParser = bodyParser.json();
 router.post('/get', jsonParser, (req, res) => {
@@ -30,7 +30,7 @@ router.post('/get/size', jsonParser, (req, res) => {
 });
 router.post('', jsonParser, async (req, res) => {
     const clientId = req.body.id;
-    const next = () => getCartProduct(req.body.productId).then((product) => {
+    const next = () => createCartProduct(req.body.productId).then((product) => {
         if (product === null) {
             res.json('Product not found');
             return;

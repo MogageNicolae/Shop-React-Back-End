@@ -6,9 +6,10 @@ import defaultRoutes from "./routes/defaultRoutes.js";
 import clientRoutes from "./routes/clientRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
-await connectDB('mongodb://localhost:27017/Shop');
-const app = express(), port = 3124;
+await connectDB('mongodb://127.0.0.1:27017/shop_nicu');
+const app = express(), port = 3000;
 
 app.use(cors());
 app.use('/', defaultRoutes);
@@ -16,6 +17,7 @@ app.use('/', clientRoutes);
 app.use('/products', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/order', orderRoutes)
+app.use('/review', reviewRoutes)
 
 app.listen(port, ()=>{
     console.log(`Server is running on port ${port}`);
