@@ -64,3 +64,4 @@ getUpdatedCartProducts = (products, productToAdd) => {
     }
     return updatedProducts;
 };
+//# sourceMappingURL=cartUtils.js.map

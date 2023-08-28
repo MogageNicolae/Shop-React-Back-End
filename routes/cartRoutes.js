@@ -96,3 +96,4 @@ router.delete('', jsonParser, async (req, res) => {
     checkToken(req, res, clientId, next);
 });
 export default router;
+//# sourceMappingURL=cartRoutes.js.map

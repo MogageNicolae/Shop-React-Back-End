@@ -12,3 +12,4 @@ export const connectDB = async (connectionUrl) => {
         console.error('Error connecting to database:', error);
     }
 };
+//# sourceMappingURL=config.js.map

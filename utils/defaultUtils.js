@@ -16,3 +16,4 @@ export const checkToken = (req, res, clientId, next) => {
         next();
     });
 };
+//# sourceMappingURL=defaultUtils.js.map

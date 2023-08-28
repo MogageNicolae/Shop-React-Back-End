@@ -6,11 +6,16 @@ export interface ReviewInterface {
     userID: string,
     productID: number,
     stars: number,
-    date: string
+    date: Date,
+    title: string
 }
 
 export const reviewSchema = new Schema<ReviewInterface>(
     {
+        title: {
+            type: String,
+            required: true
+        },
         description: {
             type: String,
             required: true
@@ -28,7 +33,8 @@ export const reviewSchema = new Schema<ReviewInterface>(
             required: true
         },
         date: {
-            type: String,
+            type: Date,
+            default: Date.now(),
             required: true
         }
     }

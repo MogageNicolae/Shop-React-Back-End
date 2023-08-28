@@ -6,3 +6,4 @@ router.get('/', (req, res) => {
     res.json('Got a get request for the default route');
 });
 export default router;
+//# sourceMappingURL=defaultRoutes.js.map

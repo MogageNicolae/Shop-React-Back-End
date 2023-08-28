@@ -15,7 +15,8 @@ app.use('/', clientRoutes);
 app.use('/products', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/order', orderRoutes);
-app.use('/review', reviewRoutes);
+app.use('/reviews', reviewRoutes);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+//# sourceMappingURL=index.js.map

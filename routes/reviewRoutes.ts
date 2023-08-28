@@ -1,14 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
-import ReviewModel from "../model/review.js";
-import {createNewReview} from "../utils/reviewUtils.js";
+import ReviewModel, {ReviewInterface} from "../model/review.js";
+import {createNewReview, updateReview} from "../utils/reviewUtils.js";
 import {checkToken} from "../utils/defaultUtils.js";
 
 const router = express.Router();
 const jsonParser = bodyParser.json()
 
-router.get('/', jsonParser, async (req, res) => {
-    ReviewModel.find({productID: req.body.productID}).exec().then(
+router.get('/product/:productID', jsonParser, async (req, res) => {
+    ReviewModel.find({productID: req.params.productID}).exec().then(
         (data) => {
             if (data.length > 0) {
                 res.json(data)
@@ -19,12 +19,33 @@ router.get('/', jsonParser, async (req, res) => {
         })
 })
 
+router.get('/user/:userID', jsonParser, async (req, res) => {
+    ReviewModel.find({userID: req.params.userID}).exec().then(
+        (data) => {
+            if (data.length > 0) {
+                res.json(data)
+            }
+            else {
+                res.status(401).send({"message": "This user has no reviews"})
+            }
+        })
+})
+
 router.post('/', jsonParser, async (req, res) => {
     const clientID = req.body.userID
     const next = () => {
         createNewReview(req.body).then((data) => res.json(data))
     }
     checkToken(req, res, clientID, next)
+})
+
+router.delete('/', async (req, res) => {
+    const clientID = req.query.clientID,
+        productID = Number(req.query.productID)
+
+    let reviews = await ReviewModel.deleteMany({"userID": clientID, "productID": productID})
+
+    res.json(reviews)
 })
 
 export default router;
