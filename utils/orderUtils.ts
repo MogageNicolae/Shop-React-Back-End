@@ -1,7 +1,12 @@
 import {CartInterface} from "../model/cart.js";
 import OrderModel from "../model/order.js";
 
-
+/**
+ * Creates a new order.
+ * @param orderData : {country, city, address, phone} - order information of the user
+ * @param cart : CartInterface - the cart of the user
+ * @returns OrderInterface - the new order
+ */
 export const createNewOrder = async (orderData: any, cart: CartInterface) => {
     const order = new OrderModel({
         country: orderData.country,
