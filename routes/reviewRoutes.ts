@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import ReviewModel, {ReviewInterface} from "../model/review.js";
-import {createNewReview, updateReview} from "../utils/reviewUtils.js";
+import ReviewModel from "../model/review.js";
+import {createNewReview} from "../utils/reviewUtils.js";
 import {checkToken} from "../utils/defaultUtils.js";
 
 const router = express.Router();
@@ -39,13 +39,10 @@ router.post('/', jsonParser, async (req, res) => {
     checkToken(req, res, clientID, next)
 })
 
-router.delete('/', async (req, res) => {
-    const clientID = req.query.clientID,
-        productID = Number(req.query.productID)
+router.delete('/:reviewID', async (req, res) => {
+    const reviewID = req.params.reviewID
 
-    let reviews = await ReviewModel.deleteMany({"userID": clientID, "productID": productID})
-
-    res.json(reviews)
+    ReviewModel.deleteOne({"_id": reviewID}).then((reviews) => res.json(reviews))
 })
 
 export default router;
