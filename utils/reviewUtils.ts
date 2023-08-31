@@ -8,9 +8,9 @@ import ReviewModel, {ReviewInterface} from "../model/review.js";
 export const createNewReview = async (reviewData: ReviewInterface) => {
     const review = new ReviewModel({
         description: reviewData.description,
-        userID: reviewData.userID,
-        productID: reviewData.productID,
-        stars: reviewData.stars,
+        userId: reviewData.userId,
+        productId: reviewData.productId,
+        rating: reviewData.rating,
         title: reviewData.title
     })
 

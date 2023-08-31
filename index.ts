@@ -8,8 +8,8 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
-await connectDB('mongodb://127.0.0.1:27017/shop_nicu');
-const app = express(), port = 3000;
+await connectDB('mongodb://localhost:27017/Shop');
+const app = express(), port = 3124;
 
 app.use(cors());
 app.use('/', defaultRoutes);
